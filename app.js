@@ -10,11 +10,24 @@ dotenv.config({path:"./config/config.env"});
 
 
 // middleware
-app.use(cors({
-    origin:[process.env.FRONTEND_URL],
-    methods:["POST"],
+const allowedOrigins = [
+  "http://localhost:5173", // local frontend
+  "https://res-frontend-beta.vercel.app", // deployed frontend
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "OPTIONS"],
     credentials: true,
-}));
+  })
+);
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
